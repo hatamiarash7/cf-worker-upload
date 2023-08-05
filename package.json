@@ -1,0 +1,12 @@
+{
+	"name": "cf-worker-upload",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"start": "wrangler dev"
+	},
+	"devDependencies": {
+		"wrangler": "^3.4.0"
+	}
+}
