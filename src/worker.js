@@ -1,60 +1,5 @@
-var url = require("url");
-
-const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>Upload test</title>
-</head>
-<body>
-<h2>Upload test</h2>
-<form id="upload_form" enctype="multipart/form-data" method="post">
-<input type="file" name="file1" id="file1" onchange="uploadFile()" /><br/>
-<progress id="progressBar" value="0" max="100" style="width: 300px"></progress>
-<h3 id="status"></h3>
-<p id="loaded_n_total"></p>
-</form>
-<script src="/script.js"></script>
-</body>
-</html>
-`;
-
-const script = `function _(el) {
-  return document.getElementById(el);
-}
-
-function uploadFile() {
-  var file = _("file1").files[0];
-  var formdata = new FormData();
-  formdata.append("file1", file);
-  var ajax = new XMLHttpRequest();
-  ajax.upload.addEventListener("progress", progressHandler, false);
-  ajax.addEventListener("load", completeHandler, false);
-  ajax.addEventListener("error", errorHandler, false);
-  ajax.addEventListener("abort", abortHandler, false);
-  ajax.open("POST", "/");
-  ajax.send(formdata);
-}
-
-function progressHandler(event) {
-  _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
-  var percent = (event.loaded / event.total) * 100;
-  _("progressBar").value = Math.round(percent);
-  _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
-}
-
-function completeHandler(event) {
-  _("status").innerHTML = event.target.responseText;
-  _("progressBar").value = 0; //wil clear progress bar after successful upload
-}
-
-function errorHandler(event) {
-  _("status").innerHTML = "Upload Failed";
-}
-
-function abortHandler(event) {
-  _("status").innerHTML = "Upload Aborted";
-}`
+const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"><title>Upload Test</title></head><body class="bg-light"><div class="container"><div class="row"><div class="col-md-6 offset-md-3"><h2 class="text-center mt-5">Upload Test</h2><div class="card my-5"><div class="card-body"><h6 class="text-center mt-1 mb-3">Choose file to begin upload</h6><form id="upload_form" enctype="multipart/form-data" method="post"><div class="custom-file mb-3"><input type="file" class="custom-file-input" id="file" name="file" onchange="uploadFile()"><label class="custom-file-label" for="file">Choose file</label></div><div id="result" style="display:none"><div class="progress mb-3"><div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="progressBar" value="0" max="100" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div></div><h5 id="status" class="text-center"></h5><p id="loaded_n_total" class="text-center"></p></div></form></div></div></div></div></div><script src="/script.js"></script></body></html>`;
+const script = `function _(e){return document.getElementById(e)}function uploadFile(){_("result").style.display="block";var e=_("file").files[0],r=new FormData;r.append("file",e);var a=new XMLHttpRequest;a.upload.addEventListener("progress",progressHandler,!1),a.addEventListener("load",completeHandler,!1),a.addEventListener("error",errorHandler,!1),a.addEventListener("abort",abortHandler,!1),a.open("POST","/"),a.send(r)}function progressHandler(e){_("loaded_n_total").innerHTML="Uploaded "+e.loaded+" bytes of "+e.total;var r=e.loaded/e.total*100,a=Math.round(r)+"%";_("progressBar").innerHTML=a,_("progressBar").style.width=a,_("status").innerHTML=Math.round(r)+"% uploaded... please wait"}function completeHandler(e){var r=JSON.parse(e.target.responseText);_("status").innerHTML="<b>Name:</b> "+r.name+"<br><b>Size:</b> "+r.size+"<br><b>Hash:</b> "+r.hash+"<br><hr>"}function errorHandler(e){_("status").innerHTML="Upload Failed"}function abortHandler(e){_("status").innerHTML="Upload Aborted"}`;
 
 export default {
 	async fetch(request, env, ctx) {
@@ -63,7 +8,7 @@ export default {
 };
 
 async function handleRequest(request) {
-	var path = url.parse(request.url).pathname
+	var path = new URL(request.url).pathname
 	if (request.method === 'GET') {
 		if (path === '/') {
 			return new Response(html, {
