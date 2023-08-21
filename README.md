@@ -2,6 +2,14 @@
 
 It's a simple worker to test upload process in Cloudflare. This will get the file and calculate the SHA-1 hash of it and return it to you.
 
+## Deploy
+
+```bash
+cp wrangler.toml.example wrangler.toml
+wrangler login
+wrangler deploy
+```
+
 ## Usage - CLI
 
 ```bash

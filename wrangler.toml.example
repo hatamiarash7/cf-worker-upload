@@ -1,0 +1,4 @@
+compatibility_date = "2023-08-01"
+main = "src/worker.js"
+name = "cf-worker-upload"
+node_compat = true
