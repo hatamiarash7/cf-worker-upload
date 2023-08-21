@@ -1,6 +1,6 @@
 # Upload test for Cloudflare
 
-It's a simple worker to test upload process in Cloudflare
+It's a simple worker to test upload process in Cloudflare. This will get the file and calculate the SHA-1 hash of it and return it to you.
 
 ## Usage - CLI
 
