@@ -29,17 +29,38 @@ async function handleRequest(request) {
 			});
 		}
 	} else if (request.method === 'POST') {
-		const formData = await request.formData();
-		console.log(formData)
-		const file = formData.get('file');
-		const hash = await sha1(file);
+		if (path === '/b64') {
+			const base64File = await request.text();
+			if (!base64File) {
+				return new Response('File data is missing in the request body.', {
+					status: 400,
+					statusText: 'File data is missing in the request body.',
+				});
+			}
+			const binaryFile = base64Decode(JSON.parse(base64File).file);
+			const hash = await sha1(binaryFile);
 
-		return new Response(JSON.stringify({
-			name: file.name,
-			type: file.type,
-			size: file.size,
-			hash,
-		}));
+			return new Response(JSON.stringify({
+				hash,
+			}));
+		} else if (path === '/') {
+			const formData = await request.formData();
+			const file = formData.get('file');
+			const data = await file.arrayBuffer();
+			const hash = await sha1(data);
+
+			return new Response(JSON.stringify({
+				name: file.name,
+				type: file.type,
+				size: file.size,
+				hash,
+			}));
+		} else {
+			return new Response('Not found', {
+				status: 404,
+				statusText: 'Not found',
+			});
+		}
 	} else {
 		return new Response('Method not allowed', {
 			status: 405,
@@ -48,10 +69,18 @@ async function handleRequest(request) {
 	}
 }
 
-async function sha1(file) {
-	const fileData = await file.arrayBuffer();
-	const digest = await crypto.subtle.digest('SHA-1', fileData);
+async function sha1(data) {
+	const digest = await crypto.subtle.digest('SHA-1', data);
 	const array = Array.from(new Uint8Array(digest));
-	const sha1 = array.map(b => b.toString(16).padStart(2, '0')).join('')
-	return sha1;
+	return array.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function base64Decode(string) {
+	string = atob(string);
+	const
+		length = string.length,
+		buf = new ArrayBuffer(length),
+		bufView = new Uint8Array(buf);
+	for (var i = 0; i < length; i++) { bufView[i] = string.charCodeAt(i) }
+	return buf
 }
