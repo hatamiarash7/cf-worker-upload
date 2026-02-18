@@ -3,23 +3,23 @@ const script = `function _(e){return document.getElementById(e)}function niceByt
 
 export default {
 	async fetch(request, env, ctx) {
-		return handleRequest(request)
+		return handleRequest(request);
 	},
 };
 
 async function handleRequest(request) {
-	var path = new URL(request.url).pathname
+	var path = new URL(request.url).pathname;
 	if (request.method === 'GET') {
 		if (path === '/') {
 			return new Response(html, {
 				headers: {
-					"content-type": "text/html;charset=UTF-8",
+					'content-type': 'text/html;charset=UTF-8',
 				},
 			});
 		} else if (path === '/script.js') {
 			return new Response(script, {
 				headers: {
-					"content-type": "application/javascript;charset=UTF-8"
+					'content-type': 'application/javascript;charset=UTF-8',
 				},
 			});
 		} else {
@@ -40,21 +40,25 @@ async function handleRequest(request) {
 			const binaryFile = base64Decode(JSON.parse(base64File).file);
 			const hash = await sha1(binaryFile);
 
-			return new Response(JSON.stringify({
-				hash,
-			}));
+			return new Response(
+				JSON.stringify({
+					hash,
+				}),
+			);
 		} else if (path === '/') {
 			const formData = await request.formData();
 			const file = formData.get('file');
 			const data = await file.arrayBuffer();
 			const hash = await sha1(data);
 
-			return new Response(JSON.stringify({
-				name: file.name,
-				type: file.type,
-				size: file.size,
-				hash,
-			}));
+			return new Response(
+				JSON.stringify({
+					name: file.name,
+					type: file.type,
+					size: file.size,
+					hash,
+				}),
+			);
 		} else {
 			return new Response('Not found', {
 				status: 404,
@@ -72,15 +76,16 @@ async function handleRequest(request) {
 async function sha1(data) {
 	const digest = await crypto.subtle.digest('SHA-1', data);
 	const array = Array.from(new Uint8Array(digest));
-	return array.map(b => b.toString(16).padStart(2, '0')).join('');
+	return array.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 function base64Decode(string) {
 	string = atob(string);
-	const
-		length = string.length,
+	const length = string.length,
 		buf = new ArrayBuffer(length),
 		bufView = new Uint8Array(buf);
-	for (var i = 0; i < length; i++) { bufView[i] = string.charCodeAt(i) }
-	return buf
+	for (var i = 0; i < length; i++) {
+		bufView[i] = string.charCodeAt(i);
+	}
+	return buf;
 }
